@@ -14,6 +14,9 @@ plt.style.use('fivethirtyeight')
 
 import numpy as np
 
+#%%
+#EDA (Exploratory Data Analysis) of Tytanic Data
+
 #%%load dataset
 #pd.read_csv() is from pandas to read csv files
 train=pd.read_csv("c:/ds_study/2019titanic/train.csv")
@@ -68,5 +71,24 @@ train['Age'].describe()
 train['Age'].plot.hist()
 #%%Age kde plot (kernel density plot)
 sns.kdeplot(train['Age'])
+#히스토그램을 연속화 시킨 것 (연속함수로 근사화시켜주는 것)
+#%%특정 값 뽑아내기
+train.head()
+train.loc[train['Survived']==0,'Age']
+#data.loc[행,[열1,열2]]
+#train.loc[train['Pclass']==2,'Survived']
+#train.loc[train['Age']<30,'Sex']
+sns.kdeplot(train.loc[train['Survived']==0,'Age'],label='died')
+sns.kdeplot(train.loc[train['Survived']==1,'Age'],label='survived')
+#두 행을 이렇게 하면 그래프가 겹쳐진다.
 
-#%%
+#%%SibSp 관찰
+train['SibSp'].value_counts()
+train['SibSp'].describe()
+train.groupby('SibSp')['Survived'].mean()
+train.groupby('SibSp')['Survived'].mean().plot()
+#survival rate decreases as SibSp is higher
+#%%Fare
+#sns.kdeplot(train['Fare'])
+sns.kdeplot(train.loc[train['Survived']==0,'Fare'],label='died')
+sns.kdeplot(train.loc[train['Survived']==1,'Fare'],label='survived')
