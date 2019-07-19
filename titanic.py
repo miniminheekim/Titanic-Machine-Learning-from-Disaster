@@ -92,3 +92,139 @@ train.groupby('SibSp')['Survived'].mean().plot()
 #sns.kdeplot(train['Fare'])
 sns.kdeplot(train.loc[train['Survived']==0,'Fare'],label='died')
 sns.kdeplot(train.loc[train['Survived']==1,'Fare'],label='survived')
+
+
+#%%
+train.columns
+#%%
+x = train[['Pclass','Sex','Age','SibSp','Parch','Fare','Embarked']]
+y = train['Survived']
+#%%
+x['Age'].isnull().sum()
+x['Age'] = x['Age'].fillna(-1)
+x['Age'].isnull().sum()
+#%%
+x['Pclass'].value_counts()
+x['Pclass'].isnull().sum()
+#%%
+x['Sex'] = x['Sex'].map({'female':0,'male':1})
+x['Sex'].head()
+
+
+#%%
+x['Age'].isnull().sum()
+x['Age'].isnull().mean()
+
+
+#%%
+x['SibSp'].isnull().sum()
+
+
+#%%
+x['Embarked'] = x['Embarked'].map({'S':0,'C':1,'Q':2})
+x['Embarked'].head()
+
+
+#%%
+x['Embarked'] = x['Embarked'].fillna(-1)
+#%%
+x['Parch'].isnull().sum()
+
+#%%
+x['Fare'].isnull().sum()
+
+#%%
+x.isnull().sum()
+#%%
+from sklearn import tree
+#%%
+clf = tree.DecisionTreeClassifier(max_depth=4)
+clf = clf.fit(x,y)
+#%%
+from sklearn.tree import export_graphviz
+import pydot
+from IPython.display import Image
+dot_data = export_graphviz(clf,out_file = None, feature_names = x.columns, 
+            class_names=['death','survived'],filled=True, rounded=True,special_characters=True  )
+graph = pydot.graph_from_dot_data(dot_data)
+Image(graph.create_png())
+graph.write_png('titanic_decision_tree.png')
+
+
+# x = train[['Pclass','Sex','Age','SibSp','Parch','Fare','Embarked']]
+# y = train['Survived']
+
+#%%
+clf.predict_proba([[3,1,20,0,0,7.25,0],[1,0,20,0,1,75.2,0]])[:,1]
+
+
+#%%
+test = pd.read_csv("http://s3.amazonaws.com/assets.datacamp.com/course/Kaggle/test.csv")
+
+#%%
+x_test = test[['Pclass','Sex','Age','SibSp','Parch','Fare','Embarked']]
+
+#%%
+x_test.head()
+
+
+#%%
+x_test.isnull().sum()
+
+
+#%%
+x_test['Pclass'].isnull().sum()
+
+
+#%%
+x_test['Sex'] = x_test['Sex'].fillna(-1)
+x_test['Sex'] = x_test['Sex'].map({'female':0,'male':1})
+x_test['Sex'].head()
+
+
+#%%
+x_test['Age'].isnull().sum()
+x_test['Age'] = x_test['Age'].fillna(-1)
+x_test['Age'].isnull().sum()
+
+
+#%%
+x_test['SibSp'].isnull().sum()
+
+
+#%%
+x_test['Fare'] = x_test['Fare'].fillna(-1)
+x_test['Fare'].isnull().sum()
+
+
+#%%
+x_test['Parch'].isnull().sum()
+
+
+#%%
+x_test.head()
+
+
+#%%
+x_test['Embarked'] = x_test['Embarked'].map({'S':0, 'C':1, 'Q':2})
+x_test['Embarked'].head()
+
+
+#%%
+x_test.isnull().sum()
+
+
+#%%
+x_test.head()
+
+
+#%%
+test['Survived'] = clf.predict_proba(x_test)[:,1]
+
+
+#%%
+test.head()
+
+
+#%%
+test[['PassengerId','Survived']].to_csv("dacon_baseline.csv",index=False)
